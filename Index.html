@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#244536">
+<title>The Family Cookbook</title>
+<style>
+:root{--green:#244536;--green2:#355843;--paper:#fbf7ec;--cream:#eee7d8;--ink:#302e25;--muted:#756a57;--line:#c9bca5;--gold:#cdbb8c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:.8rem 1rem;background:var(--green);color:#fff}
+button.secondary{background:transparent;color:var(--green);border:1px solid var(--line)}
+button:disabled{opacity:.4;cursor:not-allowed}
+header{background:var(--green);color:#f8f0df;padding:1rem clamp(1rem,4vw,2.5rem);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{font-size:clamp(1.25rem,3vw,2rem);font-weight:bold}.tagline{font: .75rem Arial,sans-serif;letter-spacing:.12em;color:#d9cba9;margin-top:.25rem}
+nav{display:flex;gap:.5rem;flex-wrap:wrap}nav button{background:#f8f0df;color:var(--green);font:600 .9rem Arial,sans-serif}
+main{max-width:1100px;margin:auto;padding:clamp(1rem,3vw,2rem)}
+h1,h2,h3,p{margin-top:0}h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.05;color:var(--green)}h2{color:var(--green)}
+.sub{font:1rem/1.5 Arial,sans-serif;color:var(--muted)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:clamp(1rem,3vw,2rem);box-shadow:0 6px 18px #51452a0b}
+.shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.book{min-height:280px;background:var(--green);color:#f8f0df;padding:1rem;border-radius:8px;box-shadow:5px 7px 0 #b5a78f;display:flex;flex-direction:column;justify-content:space-between;text-align:center;cursor:pointer}
+.book-inner{border:1px solid var(--gold);padding:1.2rem .7rem;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem}
+.book-title{font-size:2rem;line-height:1.15}.smallcaps{font: .75rem Arial,sans-serif;letter-spacing:.13em}
+.toolbar{display:flex;gap:.6rem;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:1rem}
+input,textarea,select{width:100%;border:1px solid #a99d88;border-radius:12px;padding:.85rem;background:#fffdf7;color:var(--ink);font:1rem/1.5 Arial,sans-serif}
+input:focus,textarea:focus,select:focus{outline:3px solid #a6b7a3;border-color:var(--green)}
+label{display:block;font:600 .95rem Arial,sans-serif;margin-bottom:.45rem;color:#514a3e}
+.field{margin:1rem 0}
+textarea{resize:vertical;min-height:120px;white-space:pre-wrap}
+.helper{font: .82rem/1.4 Arial,sans-serif;color:var(--muted);margin:.4rem 0 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.recipe-list{display:grid;gap:.65rem}
+.recipe-row{display:flex;align-items:center;gap:.8rem;padding:.85rem;background:#fffdf7;border:1px solid #e4dac8;border-radius:12px;cursor:pointer;text-align:left;color:var(--ink);width:100%}
+.recipe-row strong{display:block;color:var(--green);font-size:1.05rem}.recipe-row small{font: .8rem Arial,sans-serif;color:var(--muted)}
+.recipe-icon{width:52px;height:52px;display:grid;place-items:center;background:#e7deca;border-radius:10px;font-size:1.5rem;flex-shrink:0}
+.recipe-book{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;min-height:460px;box-shadow:0 12px 30px #51452a13}
+/* Realistic page-turn overlay */
+.recipe-book{position:relative;isolation:isolate;perspective:1600px}
+.recipe-book::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:50%;pointer-events:none;opacity:0;z-index:5;background:linear-gradient(90deg,#b9aa8d 0%,#f5ecd9 8%,#fffaf0 35%,#e6dcc8 100%);box-shadow:-12px 0 22px #392d1c22;border-left:1px solid #c9bca5;transform-origin:left center;backface-visibility:hidden}
+.recipe-book.turn-next::after{opacity:1;animation:turnForward .68s cubic-bezier(.35,.05,.2,1) forwards}
+.recipe-book.turn-prev::after{left:0;transform-origin:right center;background:linear-gradient(270deg,#b9aa8d 0%,#f5ecd9 8%,#fffaf0 35%,#e6dcc8 100%);box-shadow:12px 0 22px #392d1c22;border-left:0;border-right:1px solid #c9bca5;opacity:1;animation:turnBackward .68s cubic-bezier(.35,.05,.2,1) forwards}
+@keyframes turnForward{0%{transform:rotateY(0deg);filter:brightness(1)}45%{filter:brightness(.86)}100%{transform:rotateY(-178deg);filter:brightness(1);opacity:0}}
+@keyframes turnBackward{0%{transform:rotateY(0deg);filter:brightness(1)}45%{filter:brightness(.86)}100%{transform:rotateY(178deg);filter:brightness(1);opacity:0}}
+@media(prefers-reduced-motion:reduce){.recipe-book.turn-next::after,.recipe-book.turn-prev::after{animation-duration:.01ms}}
+
+.page{padding:clamp(1rem,3vw,2rem);min-width:0}.page:first-child{border-right:1px solid #e3d7c2;background:#f8f1e3}.page-num{text-align:center;color:#8a7659;margin-top:2rem;font-size:.85rem}
+.recipe-title{text-align:center;font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.1;color:var(--green)}
+.meta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;font: .85rem Arial,sans-serif;color:var(--muted);margin:1rem 0}
+ul.ingredients{padding-left:1.2rem;line-height:1.75}ol.steps{padding-left:1.5rem;line-height:1.75}li{padding-left:.2rem;margin-bottom:.4rem}
+.note{background:#eee7d8;padding:1rem;border-radius:10px;font-style:italic;color:#514a3e;white-space:pre-wrap}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+.inline-add{display:flex;gap:.5rem;align-items:center}.inline-add input{flex:1}.inline-add button{white-space:nowrap}
+.items-editor{display:grid;gap:.5rem}.item-line{display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center}.item-line input{min-width:0}.remove{background:transparent;color:#8e4037;border:1px solid #d6b7ad;padding:.6rem .75rem}
+.empty{color:var(--muted);font:1rem Arial,sans-serif;padding:1rem;text-align:center}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font: .8rem Arial,sans-serif;padding:1.5rem}
+@media(max-width:700px){
+header{align-items:flex-start;flex-direction:column}
+.split{grid-template-columns:1fr}
+/* Keep the book as a true two-page spread even on a phone. */
+.recipe-book{grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0;touch-action:pan-y;overflow:hidden}
+.page{padding:clamp(.55rem,2.5vw,1.2rem);font-size:clamp(.78rem,2.6vw,.95rem);overflow-wrap:anywhere}
+.page:first-child{border-right:1px solid #e3d7c2;border-bottom:0}
+.recipe-title{font-size:clamp(1.1rem,4vw,1.8rem)}
+.page h2{font-size:clamp(1rem,3vw,1.35rem)}
+.meta{font-size:.7rem;gap:.4rem}
+ul.ingredients{padding-left:1rem;line-height:1.5}
+ol.steps{padding-left:1.1rem;line-height:1.5}
+.page-num{margin-top:1rem}
+.book{min-height:240px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="brand">The Family Cookbook</div><div class="tagline">YOUR RECIPES · YOUR FAMILY · YOUR BOOK</div></div>
+  <nav><button id="navLibrary">Bookshelf</button><button id="navAdd">＋ Add recipe</button></nav>
+</header>
+<main>
+<section id="libraryView">
+  <div class="toolbar"><div><p class="smallcaps">YOUR PERSONAL COLLECTION</p><h1>A book full of memories.</h1><p class="sub">Recipes worth keeping, making and passing down.</p></div></div>
+  <div class="shelf">
+    <div class="book" id="openBook" role="button" tabindex="0">
+      <div class="book-inner"><div style="font-size:2rem">❧</div><div class="smallcaps">A COLLECTION OF</div><div class="book-title">Family<br>Recipes</div><div style="width:70%;border-top:1px solid var(--gold)"></div><p>Favourite dishes, shared with love</p><div class="smallcaps" id="bookCount">3 RECIPES · EST. 2026</div></div>
+      <div class="smallcaps" style="padding-top:.8rem">TAP TO OPEN</div>
+    </div>
+    <div class="panel"><h2>Inside your book</h2><div class="field"><label for="search">Search recipes</label><input id="search" placeholder="Search by recipe or ingredient…"></div><div id="recipeList" class="recipe-list"></div><div class="actions"><button id="newRecipe">＋ Write a new family recipe</button><button id="exportBtn" class="secondary">Export backup</button><label for="importFile" class="secondary" style="display:inline-block;padding:.8rem 1rem;border:1px solid var(--line);border-radius:12px;cursor:pointer">Import backup</label><input id="importFile" type="file" accept="application/json" class="hidden"></div><p class="helper">Recipes are saved on this device in this browser. Export a backup to move them to another device.</p></div>
+  </div>
+</section>
+<section id="editorView" class="hidden">
+  <div class="toolbar"><div><p class="smallcaps">WRITE YOUR OWN PAGE</p><h1 id="editorHeading">Add a family recipe</h1></div><button class="secondary" id="cancelEdit">← Back to bookshelf</button></div>
+  <form id="recipeForm" class="panel">
+    <input type="hidden" id="recipeId">
+    <div class="field"><label for="recipeTitle">Recipe name *</label><input id="recipeTitle" required placeholder="e.g. Nan's apple pie"></div>
+    <div class="split">
+      <div class="field"><label for="category">Chapter</label><select id="category"><option>Family favourites</option><option>Weeknight suppers</option><option>Puddings & baking</option><option>Starters & sides</option><option>Sunday lunches</option><option>Drinks & preserves</option></select></div>
+      <div class="field"><label for="time">Cooking time</label><input id="time" placeholder="45 mins"></div>
+    </div>
+    <div class="field"><label for="serves">Serves</label><input id="serves" placeholder="4"></div>
+    <div class="field"><label for="intro">Introduction / story</label><textarea id="intro" rows="2" placeholder="The story behind this recipe…"></textarea></div>
+    <div class="field">
+      <label>Ingredients</label>
+      <div id="ingredientRows" class="items-editor"></div>
+      <div class="inline-add" style="margin-top:.6rem"><input id="ingredientInput" placeholder="e.g. 4 eggs" aria-label="New ingredient"><button type="button" id="addIngredient">＋ Add ingredient</button></div>
+      <p class="helper">Enter one ingredient, then tap “Add ingredient”. You can also press Enter in this small field to add it. Each item stays on its own line.</p>
+    </div>
+    <div class="field">
+      <label>Cooking method</label>
+      <div id="stepRows" class="items-editor"></div>
+      <div class="inline-add" style="margin-top:.6rem"><input id="stepInput" placeholder="e.g. Preheat the oven to 180°C" aria-label="New cooking step"><button type="button" id="addStep">＋ Add step</button></div>
+      <p class="helper">Enter one instruction at a time. Tap “Add step” to build your numbered method, or press Enter in this field to add it.</p>
+    </div>
+    <div class="field"><label for="note">Family notes / secret tips</label><textarea id="note" rows="3" placeholder="Substitutions, memories or serving tips…"></textarea></div>
+    <div class="actions"><button type="submit">Save recipe to book</button><button type="button" class="secondary" id="cancelEdit2">Cancel</button></div>
+  </form>
+</section>
+<section id="readerView" class="hidden">
+  <div class="toolbar"><div><p class="smallcaps">FROM THE FAMILY COLLECTION</p><h1 style="margin-bottom:0">The recipe book</h1></div><div class="actions" style="margin-top:0"><button id="readerBack" class="secondary">← Bookshelf</button><button id="editRecipe">✎ Edit recipe</button><button id="deleteRecipe" class="secondary">Delete</button></div></div>
+  <div class="recipe-book">
+    <article class="page"><p class="smallcaps" id="readerCategory" style="text-align:center"></p><h2 id="readerTitle" class="recipe-title"></h2><p id="readerIntro" style="text-align:center;font-style:italic;line-height:1.6"></p><div class="meta"><span id="readerTime"></span><span id="readerServes"></span></div><hr style="border:0;border-top:1px solid var(--line)"><h2>Ingredients</h2><ul id="readerIngredients" class="ingredients"></ul><div id="readerNote" class="note hidden"></div><div class="page-num" id="pageLeft"></div></article>
+    <article class="page"><h2>Method</h2><ol id="readerSteps" class="steps"></ol><div class="page-num" id="pageRight"></div></article>
+  </div>
+  <div class="actions" style="justify-content:space-between"><button id="prevRecipe" class="secondary">← Previous recipe</button><span id="readerPosition" class="sub" style="align-self:center"></span><button id="nextRecipe">Next recipe →</button></div>
+</section>
+</main>
+<footer>Made for family recipes and the stories that go with them.</footer>
+<script>
+const starter=[
+{id:1,title:"Sunday Roast Chicken",category:"Family favourites",time:"1 hr 25 mins",serves:"4",intro:"A proper Sunday roast, made for gathering everyone around the table.",ingredients:["1 whole chicken, about 1.6 kg","2 tbsp olive oil","1 lemon, halved","4 garlic cloves","Rosemary and thyme","Salt and black pepper","Potatoes and seasonal vegetables"],steps:["Heat the oven to 200°C (180°C fan).","Pat the chicken dry and rub with olive oil, salt and pepper.","Place the lemon, garlic and herbs inside the cavity.","Roast until cooked through and the juices run clear. Check the thickest part reaches 75°C.","Rest for 15 minutes before carving. Serve with roast potatoes and vegetables."],note:"Family note: add extra rosemary to the potatoes."},
+{id:2,title:"Creamy Garlic Mushroom Pasta",category:"Weeknight suppers",time:"25 mins",serves:"4",intro:"A comforting, creamy pasta dish for busy evenings.",ingredients:["350 g pasta","300 g mushrooms, sliced","3 garlic cloves, finely chopped","200 ml cooking cream","40 g Parmesan, grated","1 tbsp olive oil","Fresh parsley, salt and pepper"],steps:["Cook the pasta in salted boiling water according to the packet instructions.","Heat the oil in a large pan and brown the mushrooms.","Add the garlic and cook for 30 seconds.","Stir in the cream and Parmesan. Loosen with a little pasta water if needed.","Toss through the drained pasta, season and finish with parsley."],note:"Try adding a handful of spinach at the end."},
+{id:3,title:"Traditional Apple Crumble",category:"Puddings & baking",time:"50 mins",serves:"6",intro:"Soft cinnamon-scented apples under a golden, buttery crumble topping.",ingredients:["6 medium cooking apples","75 g caster sugar","1 tsp ground cinnamon","175 g plain flour","100 g cold butter, cubed","75 g demerara sugar"],steps:["Heat the oven to 180°C (160°C fan).","Peel, core and slice the apples. Toss with caster sugar and cinnamon.","Rub the butter into the flour until it resembles breadcrumbs.","Stir the demerara sugar into the crumble mixture.","Cover the apples with the topping and bake for 35–40 minutes until golden and bubbling."],note:"Lovely served warm with custard."}
+];
+let recipes;
+try{recipes=JSON.parse(localStorage.getItem("familyCookbookRecipes")||"null")||starter}catch(e){recipes=starter}
+let activeId=null,readerList=[],readerIndex=0,ingredients=[],steps=[];
+const $=id=>document.getElementById(id);
+function persist(){try{localStorage.setItem("familyCookbookRecipes",JSON.stringify(recipes))}catch(e){alert("Browser storage is full or unavailable. Please export a backup.")}}
+function show(view){["libraryView","editorView","readerView"].forEach(id=>$(id).classList.toggle("hidden",id!==view));window.scrollTo({top:0,behavior:"smooth"})}
+function renderList(){let q=$("search").value.toLowerCase();let filtered=recipes.filter(r=>(r.title+" "+r.category+" "+r.ingredients.join(" ")).toLowerCase().includes(q));$("recipeList").innerHTML="";$("bookCount").textContent=`${recipes.length} RECIPES · EST. 2026`;if(!filtered.length){$("recipeList").innerHTML='<div class="empty">No recipes found. Try another search.</div>';return}filtered.forEach(r=>{let b=document.createElement("button");b.className="recipe-row";b.innerHTML=`<span class="recipe-icon">✧</span><span><strong></strong><small></small></span>`;b.querySelector("strong").textContent=r.title;b.querySelector("small").textContent=`${r.category} · ${r.time||"Time not set"} · Serves ${r.serves||"—"}`;b.addEventListener("click",()=>openReader(r.id));$("recipeList").appendChild(b)})}
+function makeItemRow(value,kind,i){let row=document.createElement("div");row.className="item-line";let input=document.createElement("input");input.value=value;input.setAttribute("aria-label",kind==="ingredient"?"Ingredient":"Cooking step");input.placeholder=kind==="ingredient"?"Ingredient and quantity":"Cooking instruction";input.addEventListener("input",()=>{(kind==="ingredient"?ingredients:steps)[i]=input.value});let remove=document.createElement("button");remove.type="button";remove.className="remove";remove.textContent="Remove";remove.addEventListener("click",()=>{let arr=kind==="ingredient"?ingredients:steps;arr.splice(i,1);renderItems(kind)});row.append(input,remove);return row}
+function renderItems(kind){let arr=kind==="ingredient"?ingredients:steps,box=$(kind==="ingredient"?"ingredientRows":"stepRows");box.innerHTML="";arr.forEach((v,i)=>box.appendChild(makeItemRow(v,kind,i)));if(!arr.length){let p=document.createElement("p");p.className="helper";p.textContent=kind==="ingredient"?"No ingredients added yet. Add them one by one below.":"No cooking steps added yet. Add them one by one below.";box.appendChild(p)}}
+function addItem(kind){let input=$(kind==="ingredient"?"ingredientInput":"stepInput"),value=input.value.trim();if(!value){input.focus();return} (kind==="ingredient"?ingredients:steps).push(value);input.value="";renderItems(kind);input.focus()}
+function blankEditor(){activeId=null;$("recipeForm").reset();$("recipeId").value="";ingredients=[];steps=[];renderItems("ingredient");renderItems("step");$("editorHeading").textContent="Add a family recipe";show("editorView")}
+function editExisting(r){activeId=r.id;$("recipeId").value=r.id;$("recipeTitle").value=r.title;$("category").value=r.category;$("time").value=r.time;$("serves").value=r.serves;$("intro").value=r.intro||"";$("note").value=r.note||"";ingredients=[...r.ingredients];steps=[...r.steps];renderItems("ingredient");renderItems("step");$("editorHeading").textContent="Edit family recipe";show("editorView")}
+function openReader(id){readerList=recipes.slice();readerIndex=Math.max(0,readerList.findIndex(r=>r.id===id));renderReader();show("readerView")}
+function renderReader(){let r=readerList[readerIndex];if(!r)return;$("readerCategory").textContent=r.category;$("readerTitle").textContent=r.title;$("readerIntro").textContent=r.intro||"";$("readerTime").textContent="◷ "+(r.time||"Time not set");$("readerServes").textContent="♧ Serves "+(r.serves||"—");$("readerIngredients").innerHTML="";(r.ingredients||[]).forEach(v=>{let li=document.createElement("li");li.textContent=v;$("readerIngredients").appendChild(li)});$("readerSteps").innerHTML="";(r.steps||[]).forEach(v=>{let li=document.createElement("li");li.textContent=v;$("readerSteps").appendChild(li)});$("readerNote").textContent=r.note||"";$("readerNote").classList.toggle("hidden",!r.note);$("pageLeft").textContent="— "+(readerIndex*2+1)+" —";$("pageRight").textContent="— "+(readerIndex*2+2)+" —";$("readerPosition").textContent=`Recipe ${readerIndex+1} of ${readerList.length}`;$("prevRecipe").disabled=readerIndex===0;$("nextRecipe").disabled=readerIndex>=readerList.length-1}
+$("navLibrary").onclick=()=>{renderList();show("libraryView")};$("navAdd").onclick=blankEditor;$("newRecipe").onclick=blankEditor;$("openBook").onclick=()=>{if(recipes.length)openReader(recipes[0].id)};$("openBook").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();if(recipes.length)openReader(recipes[0].id)}};$("search").addEventListener("input",renderList);$("addIngredient").onclick=()=>addItem("ingredient");$("addStep").onclick=()=>addItem("step");$("ingredientInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addItem("ingredient")}});$("stepInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addItem("step")}});
+$("recipeForm").addEventListener("submit",e=>{e.preventDefault();let title=$("recipeTitle").value.trim();if(!title)return;let recipe={id:activeId||Date.now(),title,category:$("category").value,time:$("time").value.trim(),serves:$("serves").value.trim(),intro:$("intro").value.trim(),ingredients:ingredients.map(x=>x.trim()).filter(Boolean),steps:steps.map(x=>x.trim()).filter(Boolean),note:$("note").value.trim()};if(activeId){recipes=recipes.map(r=>r.id===activeId?recipe:r)}else recipes.push(recipe);persist();renderList();openReader(recipe.id)});
+function cancel(){renderList();show("libraryView")} $("cancelEdit").onclick=cancel;$("cancelEdit2").onclick=cancel;$("readerBack").onclick=()=>{renderList();show("libraryView")};$("editRecipe").onclick=()=>{let r=readerList[readerIndex];if(r)editExisting(recipes.find(x=>x.id===r.id)||r)};$("deleteRecipe").onclick=()=>{let r=readerList[readerIndex];if(r&&confirm(`Delete “${r.title}”?`)){recipes=recipes.filter(x=>x.id!==r.id);persist();renderList();show("libraryView")}};
+let pageTurning=false;
+function turnPage(direction){
+  if(pageTurning)return;
+  const nextIndex=readerIndex+direction;
+  if(nextIndex<0||nextIndex>=readerList.length)return;
+  const book=document.querySelector(".recipe-book");
+  pageTurning=true;
+  book.classList.remove("turn-next","turn-prev");
+  void book.offsetWidth;
+  book.classList.add(direction>0?"turn-next":"turn-prev");
+  // Update the page underneath the animated paper halfway through the turn.
+  window.setTimeout(()=>{readerIndex=nextIndex;renderReader()},320);
+  window.setTimeout(()=>{book.classList.remove("turn-next","turn-prev");pageTurning=false;renderReader()},700);
+}
+
+// Finger swipe across the open spread: left = next recipe, right = previous.
+const spread=document.querySelector(".recipe-book");
+let swipeStartX=0,swipeStartY=0,swipeStartTime=0;
+spread.addEventListener("touchstart",e=>{
+  if(!e.changedTouches.length)return;
+  const t=e.changedTouches[0];
+  swipeStartX=t.clientX;swipeStartY=t.clientY;swipeStartTime=Date.now();
+},{passive:true});
+spread.addEventListener("touchend",e=>{
+  if(!e.changedTouches.length)return;
+  const t=e.changedTouches[0],dx=t.clientX-swipeStartX,dy=t.clientY-swipeStartY;
+  const elapsed=Date.now()-swipeStartTime;
+  if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.25 && elapsed<900){
+    turnPage(dx<0?1:-1);
+  }
+},{passive:true});
+$("prevRecipe").onclick=()=>turnPage(-1);
+$("nextRecipe").onclick=()=>turnPage(1);
+
+$("exportBtn").onclick=()=>{let blob=new Blob([JSON.stringify(recipes,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="family-cookbook-backup.json";a.click();URL.revokeObjectURL(url)};
+$("importFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data)||!data.every(r=>r.title&&Array.isArray(r.ingredients)&&Array.isArray(r.steps)))throw Error("Invalid file");if(confirm("Import will replace recipes currently stored in this browser. Continue?")){recipes=data;persist();renderList();alert("Cookbook imported.")}}catch(err){alert("Could not import that file. Please choose a valid cookbook backup.")}e.target.value=""};
+renderList();renderItems("ingredient");renderItems("step");
+
+document.addEventListener("keydown",e=>{
+  if($("readerView").classList.contains("hidden"))return;
+  if(e.key==="ArrowRight")turnPage(1);
+  if(e.key==="ArrowLeft")turnPage(-1);
+});
+
+</script>
+</body>
+</html>
